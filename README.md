@@ -8,5 +8,12 @@ Please have a look at https://www.iaik.tugraz.at/os
 # Meow! this is my little semester break mental illness project, I want to actually pass next semester
 
 # implemented features:
-# - build script
-# - hello world
+- build script
+- hello world
+- process thread separation
+- pids
+
+# TODO
+- [ ] exit synchronization
+- [ ] pthread create
+- [ ] pthreead exit
