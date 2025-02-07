@@ -38,6 +38,8 @@ class ProcessRegistry : public Thread
     static ProcessRegistry* instance();
     void createProcess(const char* path);
 
+    size_t getNewPID();
+
   private:
 
     char const **progs_;
@@ -45,5 +47,6 @@ class ProcessRegistry : public Thread
     Mutex counter_lock_;
     Condition all_processes_killed_;
     static ProcessRegistry* instance_;
+    ustl::atomic<size_t> pid_counter_ = 0;
 };
 

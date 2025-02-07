@@ -107,5 +107,8 @@ void ProcessRegistry::createProcess(const char* path)
 {
   debug(PROCESS_REG, "create process %s\n", path);
   new UserProcess(path, new FileSystemInfo(*working_dir_));
+}
 
+size_t ProcessRegistry::getNewPID() {
+  return pid_counter_++;
 }

@@ -24,6 +24,7 @@ public:
 //resources
     ustl::map<size_t, UserThread *> threads_; //locked by threads_lock_
     int32 fd_; //to be changed to a list of open fds maybe? todo
+    size_t pid_;
 
 
 //locks
