@@ -24,6 +24,7 @@ public:
 //resources
     ustl::map<size_t, UserThread *> threads_; //locked by threads_lock_
     int32 fd_; //to be changed to a list of open fds maybe? todo
+    bool construction_failed = true; //default to true, set to false when constructor finishes
 
 
 //locks

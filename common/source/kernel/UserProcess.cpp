@@ -20,14 +20,18 @@ loader_lock_("UserProcess::loader_lock_")
 {
   ProcessRegistry::instance()->processStart(); //should also be called if you fork a process
 
-  if (fd_ >= 0)
-    loader_ = new Loader(fd_);
+  if (fd_ < 0) {
+    debug(USERPROCESS, "Error: loading %s failed!\n", filename.c_str());
+    kill();
+    return;
+  }
+
+  loader_ = new Loader(fd_);
 
   if (!loader_ || !loader_->loadExecutableAndInitProcess())
   {
-    debug(USERTHREAD, "Error: loading %s failed!\n", filename.c_str());
-    assert(false && "todo");
-    kill();//todo status instead
+    debug(USERPROCESS, "Error: loading %s failed!\n", filename.c_str());
+    kill();
     return;
   }
 
@@ -40,6 +44,7 @@ loader_lock_("UserProcess::loader_lock_")
   debug(PROCESS_REG, "created userprocess %s\n", filename.c_str());
   Scheduler::instance()->addNewThread(u_thread);
   debug(PROCESS_REG, "added thread %s\n", filename.c_str());
+  construction_failed = false;
 }
 
 void UserProcess::kill() {
