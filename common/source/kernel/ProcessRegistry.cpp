@@ -106,8 +106,6 @@ size_t ProcessRegistry::processCount()
 void ProcessRegistry::createProcess(const char* path)
 {
   debug(PROCESS_REG, "create process %s\n", path);
-  auto p = new UserProcess(path, new FileSystemInfo(*working_dir_));
-  if (p->construction_failed)
-    delete p; //todo when fork is implemented, check if we want to just delete inside the constructor
+  new UserProcess(path, new FileSystemInfo(*working_dir_));
 
 }

@@ -23,15 +23,17 @@ loader_lock_("UserProcess::loader_lock_")
   if (fd_ < 0) {
     debug(USERPROCESS, "Error: loading %s failed!\n", filename.c_str());
     kill();
+    delete this;
     return;
   }
 
   loader_ = new Loader(fd_);
 
-  if (!loader_ || !loader_->loadExecutableAndInitProcess())
+  if (!loader_->loadExecutableAndInitProcess())
   {
     debug(USERPROCESS, "Error: loading %s failed!\n", filename.c_str());
     kill();
+    delete this;
     return;
   }
 
@@ -44,7 +46,6 @@ loader_lock_("UserProcess::loader_lock_")
   debug(PROCESS_REG, "created userprocess %s\n", filename.c_str());
   Scheduler::instance()->addNewThread(u_thread);
   debug(PROCESS_REG, "added thread %s\n", filename.c_str());
-  construction_failed = false;
 }
 
 void UserProcess::kill() {
