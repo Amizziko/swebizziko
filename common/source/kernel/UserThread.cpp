@@ -31,10 +31,7 @@ UserThread::UserThread(UserProcess *parent, const ustl::string& filename, FileSy
 
   debug(USERTHREAD, "ctor: Done loading %s\n", filename.c_str());
 
-  parent_->threads_lock_.acquire();
-  assert(!parent_->threads_.count(getTID()) && "Tried to add a duplicate TID!");
-  parent_->threads_.emplace(getTID(), this);
-  parent_->threads_lock_.release();
+  parent->addThread(this);
 }
 
 void UserThread::kill() {
@@ -45,10 +42,12 @@ void UserThread::kill() {
   parent_->threads_.erase(getTID());
   if (parent_->threads_.empty()) {
     debug(USERTHREAD, "kill called on final thread\n");
-    parent_->kill();
     final = true;
   }
   parent_->threads_lock_.release();
+
+  if (final)
+    parent_->kill();
 
   debug(USERTHREAD, "userthread kill complete!\n");
 

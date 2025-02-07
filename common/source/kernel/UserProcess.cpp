@@ -78,3 +78,10 @@ UserProcess::~UserProcess()
   delete fs_info_;
   debug(USERPROCESS, "Destructor complete!\n");
 }
+
+void UserProcess::addThread(UserThread *t) {
+  threads_lock_.acquire();
+  assert(!threads_.count(t->getTID()) && "Tried to add a duplicate TID!");
+  threads_.emplace(t->getTID(), t);
+  threads_lock_.release();
+}

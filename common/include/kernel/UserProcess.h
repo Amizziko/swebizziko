@@ -16,6 +16,7 @@ public:
      *
      */
     UserProcess(ustl::string minixfs_filename, FileSystemInfo *fs_info, uint32 terminal_number = 0);
+    void kill();
     ~UserProcess();
 
     Loader* loader_;
@@ -31,8 +32,8 @@ public:
     Mutex threads_lock_;
     Mutex loader_lock_;
 
-    void kill();
 
     bool loaderValid(const ustl::string &filename);
+    void addThread(UserThread *t);
 };
 
