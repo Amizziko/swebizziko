@@ -70,6 +70,7 @@ void Scheduler::addNewThread(Thread *thread)
   KernelMemoryManager::instance()->getKMMLock().release();
   threads_.push_back(thread);
   unlockScheduling();
+  debug(SCHEDULER, "thread added to scheduler \n");
 }
 
 void Scheduler::sleep()

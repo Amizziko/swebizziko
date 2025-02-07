@@ -14,7 +14,7 @@ void UserThread::Run() {
   assert(false);
 }
 
-UserThread::UserThread(UserProcess *parent, ustl::string filename, FileSystemInfo *fs_info) :
+UserThread::UserThread(UserProcess *parent, const ustl::string& filename, FileSystemInfo *fs_info) :
         Thread(fs_info, filename, Thread::USER_THREAD), parent_(parent)
 {
   loader_ = parent->loader_;

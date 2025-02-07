@@ -32,5 +32,7 @@ public:
     Mutex loader_lock_;
 
     void kill();
+
+    bool loaderValid(const ustl::string &filename);
 };
 

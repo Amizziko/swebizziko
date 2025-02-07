@@ -13,7 +13,7 @@ class UserThread : public Thread {
     friend class UserProcess;
 
 public:
-    UserThread(UserProcess *parent, ustl::string filename, FileSystemInfo *fs_info);
+    UserThread(UserProcess *parent, const ustl::string& filename, FileSystemInfo *fs_info);
     ~UserThread();
     void Run() override; // not used
     void kill() override;
