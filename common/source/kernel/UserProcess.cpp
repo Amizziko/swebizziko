@@ -9,9 +9,14 @@
 #include "ArchThreads.h"
 #include "offsets.h"
 #include "Scheduler.h"
+#include "UserThread.h"
 
 UserProcess::UserProcess(ustl::string filename, FileSystemInfo *fs_info, uint32 terminal_number) :
-    Thread(fs_info, filename, Thread::USER_THREAD), fd_(VfsSyscall::open(filename, O_RDONLY))
+fd_(VfsSyscall::open(filename, O_RDONLY)),
+
+//locks
+threads_lock_("UserProcess::threads_lock_"),
+loader_lock_("UserProcess::loader_lock_")
 {
   ProcessRegistry::instance()->processStart(); //should also be called if you fork a process
 
@@ -20,47 +25,42 @@ UserProcess::UserProcess(ustl::string filename, FileSystemInfo *fs_info, uint32 
 
   if (!loader_ || !loader_->loadExecutableAndInitProcess())
   {
-    debug(USERPROCESS, "Error: loading %s failed!\n", filename.c_str());
-    kill();
+    debug(USERTHREAD, "Error: loading %s failed!\n", filename.c_str());
+    assert(false && "todo");
+    kill();//todo status instead
     return;
   }
 
-  size_t page_for_stack = PageManager::instance()->allocPPN();
-  bool vpn_mapped = loader_->arch_memory_.mapPage(USER_BREAK / PAGE_SIZE - 1, page_for_stack, 1);
-  assert(vpn_mapped && "Virtual page for stack was already mapped - this should never happen");
-
-  ArchThreads::createUserRegisters(user_registers_, loader_->getEntryFunction(),
-                                   (void*) (USER_BREAK - sizeof(pointer)),
-                                   getKernelStackStartPointer());
-
-  ArchThreads::setAddressSpace(this, loader_->arch_memory_);
-
-  debug(USERPROCESS, "ctor: Done loading %s\n", filename.c_str());
+  auto u_thread = new UserThread(this, filename, fs_info);
 
   if (main_console->getTerminal(terminal_number))
-    setTerminal(main_console->getTerminal(terminal_number));
+    u_thread->setTerminal(main_console->getTerminal(terminal_number));
 
-  switch_to_userspace_ = 1;
+  u_thread->switch_to_userspace_ = 1;
+  debug(PROCESS_REG, "created userprocess %s\n", filename.c_str());
+  Scheduler::instance()->addNewThread(u_thread);
+  debug(PROCESS_REG, "added thread %s\n", filename.c_str());
 }
 
+void UserProcess::kill() {
+  assert(threads_.empty() && "you probably shouldnt be calling process.kill()");
+
+  debug(USERPROCESS, "kill called on process --\n");
+  ProcessRegistry::instance()->processExit();//holds locks
+  debug(USERPROCESS, "process kill complete!\n");
+}
+
+//do not hold locks here
 UserProcess::~UserProcess()
 {
   assert(Scheduler::instance()->isCurrentlyCleaningUp());
+  assert(currentThread->holding_lock_list_ == nullptr && "do NOT hold locks in the destructor - do locked operations in kill()");
+
+  debug(USERPROCESS, "destructor called on process --\n");
   delete loader_;
-  loader_ = 0;
 
   if (fd_ > 0)
     VfsSyscall::close(fd_);
-
-  delete working_dir_;
-  working_dir_ = 0;
-
-  ProcessRegistry::instance()->processExit();
+  delete fs_info_;
+  debug(USERPROCESS, "process destructor complete!\n");
 }
-
-void UserProcess::Run()
-{
-  debug(USERPROCESS, "Run: Fail-safe kernel panic - you probably have forgotten to set switch_to_userspace_ = 1\n");
-  assert(false);
-}
-

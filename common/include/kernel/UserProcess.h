@@ -1,10 +1,13 @@
 #pragma once
 
-#include "Thread.h"
+#include "UserThread.h"
+#include "umap.h"
+#include "Mutex.h"
 
-class UserProcess : public Thread
-{
-  public:
+class UserProcess {
+    friend class UserThread;
+
+public:
     /**
      * Constructor
      * @param minixfs_filename filename of the file in minixfs to execute
@@ -13,12 +16,20 @@ class UserProcess : public Thread
      *
      */
     UserProcess(ustl::string minixfs_filename, FileSystemInfo *fs_info, uint32 terminal_number = 0);
+    ~UserProcess();
 
-    virtual ~UserProcess();
+    Loader* loader_;
+    FileSystemInfo *fs_info_;
 
-    virtual void Run(); // not used
+//resources
+    ustl::map<size_t, UserThread *> threads_; //locked by threads_lock_
+    int32 fd_; //to be changed to a list of open fds maybe? todo
 
-  private:
-    int32 fd_;
+
+//locks
+    Mutex threads_lock_;
+    Mutex loader_lock_;
+
+    void kill();
 };
 

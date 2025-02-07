@@ -45,6 +45,7 @@ const size_t SYSCALL            = Ansi_Blue    | OUTPUT_ENABLED;
 const size_t MAIN               = Ansi_Red     | OUTPUT_ENABLED;
 const size_t THREAD             = Ansi_Magenta | OUTPUT_ENABLED;
 const size_t USERPROCESS        = Ansi_Cyan    | OUTPUT_ENABLED;
+const size_t USERTHREAD         = Ansi_Green    | OUTPUT_ENABLED;
 const size_t PROCESS_REG        = Ansi_Yellow  | OUTPUT_ENABLED;
 const size_t BACKTRACE          = Ansi_Cyan    | OUTPUT_ENABLED;
 const size_t USERTRACE          = Ansi_Red     | OUTPUT_ENABLED;
@@ -86,3 +87,5 @@ const size_t M_STORAGE_MANAGER  = Ansi_Yellow;
 const size_t M_INODE            = Ansi_Yellow;
 const size_t M_SB               = Ansi_Yellow;
 const size_t M_ZONE             = Ansi_Yellow;
+
+const size_t MEOW             = Ansi_Yellow | OUTPUT_ENABLED;
