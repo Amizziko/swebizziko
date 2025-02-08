@@ -18,20 +18,29 @@ UserThread::UserThread(UserProcess *parent, const ustl::string& filename, FileSy
         Thread(fs_info, filename, Thread::USER_THREAD), parent_(parent)
 {
   loader_ = parent->loader_;
+}
 
+void UserThread::prologue(){
+  //todo?
+}
+
+void UserThread::configureStack() {
   size_t page_for_stack = PageManager::instance()->allocPPN();
   bool vpn_mapped = loader_->arch_memory_.mapPage(USER_BREAK / PAGE_SIZE - 1, page_for_stack, 1);
   assert(vpn_mapped && "Virtual page for stack was already mapped - this should never happen");
+}
 
-  ArchThreads::createUserRegisters(user_registers_, loader_->getEntryFunction(),
+void UserThread::configureRegistersStartPthread(void *start_function) {
+  ArchThreads::createUserRegisters(user_registers_, start_function,
                                    (void*) (USER_BREAK - sizeof(pointer)),
                                    getKernelStackStartPointer());
+}
 
+void UserThread::epilogue() {
   ArchThreads::setAddressSpace(this, loader_->arch_memory_);
 
-  debug(USERTHREAD, "ctor: Done loading %s\n", filename.c_str());
-
-  parent->addThread(this);
+  debug(USERTHREAD, "ctor: Done loading %s\n", parent_->path_.c_str());
+  parent_->addThread(this);
 }
 
 void UserThread::kill() {

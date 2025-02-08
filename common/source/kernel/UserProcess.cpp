@@ -89,17 +89,16 @@ void UserProcess::addThread(UserThread *t) {
 }
 
 UserThread *UserProcess::createThread(thread_create::data &data) {
-  //data is interpreted as nothing, a thread which should act as the source for a copy, or as the entry function of a pthread
-  //thread creation modes: start thread, fork thread, pthread (exec thread is a start thread again)
-  //differences: stack reservation and register filling
-  //rip is different for all,
-  UserThread* thread = nullptr;
+  auto thread = new UserThread(this, path_, fs_info_);
+//  thread->prologue(); //might be needed, not sure
+  thread->configureStack();
 
   switch (data.mode) {
     case thread_create::START:
-      thread = new UserThread(this, path_, fs_info_);
+      thread->configureRegistersStartPthread(loader_->getEntryFunction());
       break;
     case thread_create::PTHREAD:
+      thread->configureRegistersStartPthread(data.entry_function);
       break;
     case thread_create::FORK:
       assert(false && "todo fork thread");
@@ -107,6 +106,8 @@ UserThread *UserProcess::createThread(thread_create::data &data) {
     default:
       assert(false && "unknown thread type passed to createThread");
   }
+
+  thread->epilogue();
   
   return thread;
 }

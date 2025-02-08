@@ -27,6 +27,10 @@ public:
 
 
     //functions
+    void prologue();
+    void configureStack();
+    void configureRegistersStartPthread(void *start_function);
+    void epilogue();
 };
 
 
