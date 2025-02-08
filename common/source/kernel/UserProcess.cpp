@@ -12,7 +12,8 @@
 #include "UserThread.h"
 
 UserProcess::UserProcess(ustl::string filename, FileSystemInfo *fs_info, uint32 terminal_number) :
-fd_(VfsSyscall::open(filename, O_RDONLY)), pid_(ProcessRegistry::instance()->getNewPID()),
+path_(filename), fs_info_(fs_info), fd_(VfsSyscall::open(filename, O_RDONLY)),
+pid_(ProcessRegistry::instance()->getNewPID()),
 
 //locks
 threads_lock_("UserProcess::threads_lock_"),
@@ -24,7 +25,8 @@ loader_lock_("UserProcess::loader_lock_")
   if(!loaderValid(filename))
     return;
 
-  auto u_thread = new UserThread(this, filename, fs_info);
+  auto data = thread_create::data();
+  auto u_thread = createThread(data);
 
   if (main_console->getTerminal(terminal_number))
     u_thread->setTerminal(main_console->getTerminal(terminal_number));
@@ -84,4 +86,27 @@ void UserProcess::addThread(UserThread *t) {
   assert(!threads_.count(t->getTID()) && "Tried to add a duplicate TID!");
   threads_.emplace(t->getTID(), t);
   threads_lock_.release();
+}
+
+UserThread *UserProcess::createThread(thread_create::data &data) {
+  //data is interpreted as nothing, a thread which should act as the source for a copy, or as the entry function of a pthread
+  //thread creation modes: start thread, fork thread, pthread (exec thread is a start thread again)
+  //differences: stack reservation and register filling
+  //rip is different for all,
+  UserThread* thread = nullptr;
+
+  switch (data.mode) {
+    case thread_create::START:
+      thread = new UserThread(this, path_, fs_info_);
+      break;
+    case thread_create::PTHREAD:
+      break;
+    case thread_create::FORK:
+      assert(false && "todo fork thread");
+      break;
+    default:
+      assert(false && "unknown thread type passed to createThread");
+  }
+  
+  return thread;
 }

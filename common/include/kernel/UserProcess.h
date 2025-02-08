@@ -3,6 +3,7 @@
 #include "UserThread.h"
 #include "umap.h"
 #include "Mutex.h"
+#include "helpers.h"
 
 class UserProcess {
     friend class UserThread;
@@ -20,6 +21,7 @@ public:
     ~UserProcess();
 
     Loader* loader_;
+    ustl::string path_;
     FileSystemInfo *fs_info_;
 
 //resources
@@ -35,5 +37,6 @@ public:
 
     bool loaderValid(const ustl::string &filename);
     void addThread(UserThread *t);
+    UserThread *createThread(thread_create::data &data);
 };
 
