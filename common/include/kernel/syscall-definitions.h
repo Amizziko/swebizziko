@@ -17,3 +17,10 @@
 #define sc_createprocess 191
 #define sc_trace 252
 
+#define sc_pthread_create 256
+#define sc_pthread_exit 257
+#define sc_pthread_join 258
+#define sc_pthread_detach 259
+#define sc_pthread_cancel 260
+#define sc_pthread_set_cancel_state 261
+#define sc_pthread_set_cancel_type 262

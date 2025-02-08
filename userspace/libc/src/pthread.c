@@ -1,4 +1,12 @@
 #include "pthread.h"
+#include "syscall.h"
+#include "../../../common/include/kernel/syscall-definitions.h"
+
+int _pthread_start(void *(*start_routine)(void *), void *arg)
+{
+  pthread_exit(start_routine(arg));
+  return -1;
+}
 
 /**
  * function stub
@@ -7,8 +15,9 @@
 int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
                    void *(*start_routine)(void *), void *arg)
 {
-  return -1;
+  return __syscall(sc_pthread_create, (size_t)thread, (size_t)attr, (size_t)start_routine, (size_t)arg, (size_t)&_pthread_start);
 }
+
 
 /**
  * function stub

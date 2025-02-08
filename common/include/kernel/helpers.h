@@ -20,14 +20,18 @@ namespace thread_create {
         create_mode mode;
         union {
             UserThread *src;
-            void *entry_function;
+            struct {
+                void *entry_function;
+                void *start_routine;
+                void *arg;
+            };
         };
 
-        data() : mode(START){};
-        data(enum create_mode mode, void* data) : mode(mode), entry_function(data) {};
+        explicit data(void* entry) : mode(START), entry_function(entry){};
+        data(void *entry, void *start, void *a) : mode(PTHREAD), entry_function(entry), start_routine(start), arg(a) {};
+        explicit data(UserThread *forker) : mode(FORK), src(forker) {};//todo
     };
 }
-
 
 
 #endif //SWEB_HELPERS_H

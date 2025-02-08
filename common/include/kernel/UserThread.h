@@ -6,6 +6,7 @@
 #define SWEB_USERTHREAD_H
 
 #include "Thread.h"
+#include "helpers.h"
 
 class UserProcess;
 
@@ -29,9 +30,12 @@ public:
     //functions
     void prologue();
     void configureStack();
-    void configureRegistersStartPthread(void *start_function);
+    void configureRegistersStart(thread_create::data& data);
+    void configureRegistersPthread(thread_create::data& data);
     void epilogue();
 };
 
+#define currentUserThread ((UserThread*)currentThread)
+#define currentUserProcess ((UserProcess*)currentUserThread->parent_)
 
 #endif //SWEB_USERTHREAD_H

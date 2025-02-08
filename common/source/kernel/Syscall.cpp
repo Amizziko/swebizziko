@@ -7,6 +7,8 @@
 #include "ProcessRegistry.h"
 #include "File.h"
 #include "Scheduler.h"
+#include "UserThread.h"
+#include "UserProcess.h"
 
 size_t Syscall::syscallException(size_t syscall_number, size_t arg1, size_t arg2, size_t arg3, size_t arg4, size_t arg5)
 {
@@ -48,6 +50,9 @@ size_t Syscall::syscallException(size_t syscall_number, size_t arg1, size_t arg2
       break;
     case sc_pseudols:
       pseudols((const char*) arg1, (char*) arg2, arg3);
+      break;
+    case sc_pthread_create:
+      return_value = createThread(arg1, arg2, arg3, arg4, arg5);
       break;
     default:
       return_value = -1;
@@ -179,5 +184,14 @@ size_t Syscall::createprocess(size_t path, size_t sleep)
 void Syscall::trace()
 {
   currentThread->printBacktrace();
+}
+
+size_t Syscall::createThread(size_t tid_addr, size_t attr_addr, size_t start_routine, size_t arg, size_t entry_function) {
+  (void)tid_addr;
+  (void)attr_addr;
+
+  auto data = thread_create::data((void*)entry_function, (void*)start_routine, (void*)arg);
+  currentUserProcess->createThread(data);
+  return 0;
 }
 

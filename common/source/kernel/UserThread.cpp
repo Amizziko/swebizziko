@@ -30,10 +30,19 @@ void UserThread::configureStack() {
   assert(vpn_mapped && "Virtual page for stack was already mapped - this should never happen");
 }
 
-void UserThread::configureRegistersStartPthread(void *start_function) {
-  ArchThreads::createUserRegisters(user_registers_, start_function,
+void UserThread::configureRegistersStart(thread_create::data& data) {
+  ArchThreads::createUserRegisters(user_registers_, data.entry_function,
                                    (void*) (USER_BREAK - sizeof(pointer)),
                                    getKernelStackStartPointer());
+}
+
+void UserThread::configureRegistersPthread(thread_create::data& data) {
+  ArchThreads::createUserRegisters(user_registers_, data.entry_function,
+                                   (void*) (USER_BREAK - sizeof(pointer)),
+                                   getKernelStackStartPointer());
+
+  user_registers_->rdi = (uint64)data.start_routine;
+  user_registers_->rsi = (uint64)data.arg;
 }
 
 void UserThread::epilogue() {

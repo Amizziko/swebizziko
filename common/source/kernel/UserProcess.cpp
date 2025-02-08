@@ -25,7 +25,7 @@ loader_lock_("UserProcess::loader_lock_")
   if(!loaderValid(filename))
     return;
 
-  auto data = thread_create::data();
+  auto data = thread_create::data(loader_->getEntryFunction());
   auto u_thread = createThread(data);
 
   if (main_console->getTerminal(terminal_number))
@@ -95,10 +95,10 @@ UserThread *UserProcess::createThread(thread_create::data &data) {
 
   switch (data.mode) {
     case thread_create::START:
-      thread->configureRegistersStartPthread(loader_->getEntryFunction());
+      thread->configureRegistersStart(data);
       break;
     case thread_create::PTHREAD:
-      thread->configureRegistersStartPthread(data.entry_function);
+      thread->configureRegistersPthread(data);
       break;
     case thread_create::FORK:
       assert(false && "todo fork thread");
@@ -108,6 +108,6 @@ UserThread *UserProcess::createThread(thread_create::data &data) {
   }
 
   thread->epilogue();
-  
+
   return thread;
 }
