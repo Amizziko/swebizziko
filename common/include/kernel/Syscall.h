@@ -20,5 +20,7 @@ class Syscall
     static void trace();
 
     static size_t createThread(size_t tid_addr, size_t attr_addr, size_t start_routine, size_t arg, size_t entry_function);
+
+    static void exitThread(size_t retval);
 };
 

@@ -88,6 +88,8 @@ class Thread
 
     Loader* loader_;
 
+    TYPE type_;
+
 
     void setState(ThreadState state);
 

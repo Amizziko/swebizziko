@@ -54,6 +54,9 @@ size_t Syscall::syscallException(size_t syscall_number, size_t arg1, size_t arg2
     case sc_pthread_create:
       return_value = createThread(arg1, arg2, arg3, arg4, arg5);
       break;
+    case sc_pthread_exit:
+      exitThread(arg1);
+      break;
     default:
       return_value = -1;
       kprintf("Syscall::syscallException: Unimplemented Syscall Number %zd\n", syscall_number);
@@ -187,11 +190,21 @@ void Syscall::trace()
 }
 
 size_t Syscall::createThread(size_t tid_addr, size_t attr_addr, size_t start_routine, size_t arg, size_t entry_function) {
+  if (currentThread->type_ != Thread::USER_THREAD) return -1;
   (void)tid_addr;
   (void)attr_addr;
+
+  debug(PTHREAD_CREATE, "called by thread %zu, in proces %zu\n", currentThread->getTID(), currentUserProcess->pid_);
 
   auto data = thread_create::data((void*)entry_function, (void*)start_routine, (void*)arg);
   currentUserProcess->createThread(data);
   return 0;
+}
+
+void Syscall::exitThread(size_t retval) {
+  if (currentThread->type_ != Thread::USER_THREAD) return;
+
+  debug(PTHREAD_EXIT, "called on thread %zu with retval %zu\n", currentThread->getTID(), retval);
+  currentThread->kill();
 }
 
