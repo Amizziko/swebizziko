@@ -81,6 +81,8 @@ UserProcess::~UserProcess() {
   debug(USERPROCESS, "Destructor complete!\n");
 }
 
+size_t UserProcess::getNewTID() { return tid_counter_++; }
+
 void UserProcess::addThread(UserThread *t) {
   threads_lock_.acquire();
   assert(!threads_.count(t->getTID()) && "Tried to add a duplicate TID!");
@@ -110,8 +112,4 @@ UserThread *UserProcess::createThread(thread_create::data &data) {
   thread->epilogue();
 
   return thread;
-}
-
-size_t UserProcess::getNewTID() {
-  return tid_counter_++;
 }
