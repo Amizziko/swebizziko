@@ -9,5 +9,6 @@ void* foo(void* arg){
 int main(){
   printf("Pthread Create test!\n");
   pthread_create(0, 0, &foo, (void*)5);
+  getchar();
   return 0;
 }

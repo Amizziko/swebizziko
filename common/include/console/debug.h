@@ -88,4 +88,10 @@ const size_t M_INODE            = Ansi_Yellow;
 const size_t M_SB               = Ansi_Yellow;
 const size_t M_ZONE             = Ansi_Yellow;
 
+//group memory
+const size_t MEMORYMANAGER             = Ansi_Red  | OUTPUT_ENABLED;
+const size_t STACKMANAGER             = Ansi_Red  | OUTPUT_ENABLED;
+const size_t HEAPMANAGER             = Ansi_Red  | OUTPUT_ENABLED;
+const size_t MAPMANAGER             = Ansi_Red  | OUTPUT_ENABLED;
+
 const size_t MEOW             = Ansi_Yellow | OUTPUT_ENABLED;

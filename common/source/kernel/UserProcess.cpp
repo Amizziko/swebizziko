@@ -12,17 +12,17 @@
 #include "UserThread.h"
 
 UserProcess::UserProcess(ustl::string filename, FileSystemInfo *fs_info, uint32 terminal_number) :
-path_(filename), fs_info_(fs_info), fd_(VfsSyscall::open(filename, O_RDONLY)),
-pid_(ProcessRegistry::instance()->getNewPID()),
+        memory_manager_(this),
+        path_(filename), fs_info_(fs_info), fd_(VfsSyscall::open(filename, O_RDONLY)),
+        pid_(ProcessRegistry::instance()->getNewPID()),
 
 //locks
-threads_lock_("UserProcess::threads_lock_"),
-loader_lock_("UserProcess::loader_lock_")
-{
+        threads_lock_("UserProcess::threads_lock_"),
+        loader_lock_("UserProcess::loader_lock_") {
   ProcessRegistry::instance()->processStart(); //should also be called if you fork a process
   debug(USERPROCESS, "UserProcess constructor start for PID %zu, path %s\n", pid_, filename.c_str());
 
-  if(!loaderValid(filename))
+  if (!loaderValid(filename))
     return;
 
   auto data = thread_create::data(loader_->getEntryFunction());
@@ -48,8 +48,7 @@ bool UserProcess::loaderValid(const ustl::string &filename) {
 
   loader_ = new Loader(fd_);
 
-  if (!loader_->loadExecutableAndInitProcess())
-  {
+  if (!loader_->loadExecutableAndInitProcess()) {
     debug(USERPROCESS, "Error: loading %s failed!\n", filename.c_str());
     kill();
     delete this;
@@ -67,10 +66,10 @@ void UserProcess::kill() {
 }
 
 //do not hold locks here
-UserProcess::~UserProcess()
-{
+UserProcess::~UserProcess() {
   assert(Scheduler::instance()->isCurrentlyCleaningUp());
-  assert(currentThread->holding_lock_list_ == nullptr && "do NOT hold locks in the destructor - do locked operations in kill()");
+  assert(currentThread->holding_lock_list_ == nullptr &&
+         "do NOT hold locks in the destructor - do locked operations in kill()");
 
   debug(USERPROCESS, "Destructor called on Process %zu\n", pid_);
   delete loader_;

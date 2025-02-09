@@ -4,6 +4,8 @@
 #include "umap.h"
 #include "Mutex.h"
 #include "helpers.h"
+#include "MemoryManager.h"
+
 
 class UserProcess {
     friend class UserThread;
@@ -20,6 +22,7 @@ public:
     void kill();
     ~UserProcess();
 
+    MemoryManager memory_manager_;
     Loader* loader_;
     ustl::string path_;
     FileSystemInfo *fs_info_;
