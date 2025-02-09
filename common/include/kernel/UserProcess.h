@@ -32,6 +32,8 @@ public:
     int32 fd_; //to be changed to a list of open fds maybe? todo
     size_t pid_;
 
+    ustl::atomic<size_t> tid_counter_;
+
 
 //locks
     Mutex threads_lock_;
@@ -39,6 +41,7 @@ public:
 
 
     bool loaderValid(const ustl::string &filename);
+    size_t getNewTID();
     void addThread(UserThread *t);
     UserThread *createThread(thread_create::data &data);
 };

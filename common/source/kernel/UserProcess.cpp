@@ -15,6 +15,7 @@ UserProcess::UserProcess(ustl::string filename, FileSystemInfo *fs_info, uint32 
         memory_manager_(this),
         path_(filename), fs_info_(fs_info), fd_(VfsSyscall::open(filename, O_RDONLY)),
         pid_(ProcessRegistry::instance()->getNewPID()),
+        tid_counter_(0),
 
 //locks
         threads_lock_("UserProcess::threads_lock_"),
@@ -90,7 +91,7 @@ void UserProcess::addThread(UserThread *t) {
 UserThread *UserProcess::createThread(thread_create::data &data) {
   auto thread = new UserThread(this, path_, fs_info_);
 //  thread->prologue(); //might be needed, not sure
-  thread->configureStack();
+  memory_manager_.stack.createStack(thread->getTID());
 
   switch (data.mode) {
     case thread_create::START:
@@ -109,4 +110,8 @@ UserThread *UserProcess::createThread(thread_create::data &data) {
   thread->epilogue();
 
   return thread;
+}
+
+size_t UserProcess::getNewTID() {
+  return tid_counter_++;
 }

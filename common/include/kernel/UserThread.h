@@ -29,7 +29,6 @@ public:
 
     //functions
     void prologue();
-    void configureStack();
     void configureRegistersStart(thread_create::data& data);
     void configureRegistersPthread(thread_create::data& data);
     void epilogue();

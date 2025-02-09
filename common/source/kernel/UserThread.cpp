@@ -15,19 +15,13 @@ void UserThread::Run() {
 }
 
 UserThread::UserThread(UserProcess *parent, const ustl::string& filename, FileSystemInfo *fs_info) :
-        Thread(fs_info, filename, Thread::USER_THREAD), parent_(parent)
+        Thread(fs_info, filename, Thread::USER_THREAD, parent->getNewTID()), parent_(parent)
 {
   loader_ = parent->loader_;
 }
 
 void UserThread::prologue(){
   //todo?
-}
-
-void UserThread::configureStack() {
-  size_t page_for_stack = PageManager::instance()->allocPPN();
-  bool vpn_mapped = loader_->arch_memory_.mapPage(USER_BREAK / PAGE_SIZE - 1, page_for_stack, 1);
-  assert(vpn_mapped && "Virtual page for stack was already mapped - this should never happen");
 }
 
 void UserThread::configureRegistersStart(thread_create::data& data) {
@@ -54,6 +48,8 @@ void UserThread::epilogue() {
 
 void UserThread::kill() {
   debug(USERTHREAD, "kill called on userthread %zu\n", getTID());
+
+  parent_->memory_manager_.stack.freeStack(getTID());//todo locking?
 
   parent_->threads_lock_.acquire();
   assert(parent_->threads_.count(getTID()) && "Tried to remove a nonexistent TID!");
