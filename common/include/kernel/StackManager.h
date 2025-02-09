@@ -19,6 +19,7 @@ public:
     StackManager(UserProcess *parent);
 
     void createStack(size_t tid);
+    size_t getStackOfThread(size_t tid);
 
     void freeStack(size_t tid);
 };

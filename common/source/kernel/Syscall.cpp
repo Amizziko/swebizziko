@@ -194,10 +194,11 @@ size_t Syscall::createThread(size_t tid_addr, size_t attr_addr, size_t start_rou
   (void)tid_addr;
   (void)attr_addr;
 
-  debug(PTHREAD_CREATE, "called by thread %zu, in proces %zu\n", currentThread->getTID(), currentUserProcess->pid_);
+  debug(PTHREAD_CREATE, "called by thread %zu, process %zu\n", currentThread->getTID(), currentUserProcess->pid_);
 
   auto data = thread_create::data((void*)entry_function, (void*)start_routine, (void*)arg);
-  currentUserProcess->createThread(data);
+  auto pthread = currentUserProcess->createThread(data);
+  Scheduler::instance()->addNewThread(pthread);
   return 0;
 }
 

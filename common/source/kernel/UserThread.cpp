@@ -26,13 +26,13 @@ void UserThread::prologue(){
 
 void UserThread::configureRegistersStart(thread_create::data& data) {
   ArchThreads::createUserRegisters(user_registers_, data.entry_function,
-                                   (void*) (USER_BREAK - sizeof(pointer)),
+                                   (void*) (USER_BREAK - sizeof(pointer)), //todo??
                                    getKernelStackStartPointer());
 }
 
 void UserThread::configureRegistersPthread(thread_create::data& data) {
   ArchThreads::createUserRegisters(user_registers_, data.entry_function,
-                                   (void*) (USER_BREAK - sizeof(pointer)),
+                                   (void*)(parent_->memory_manager_.stack.getStackOfThread(getTID()) - sizeof(pointer)),
                                    getKernelStackStartPointer());
 
   user_registers_->rdi = (uint64)data.start_routine;

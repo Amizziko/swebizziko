@@ -2,9 +2,10 @@
 #include "syscall.h"
 #include "../../../common/include/kernel/syscall-definitions.h"
 
-int _pthread_start(void *(*start_routine)(void *), void *arg)
+int _pthread_start(void *start_routine, void *arg)
 {
-  pthread_exit(start_routine(arg));
+  void *(*f)(void *) = start_routine;
+  pthread_exit(f(arg));
   return -1;
 }
 
