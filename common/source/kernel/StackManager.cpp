@@ -8,6 +8,9 @@
 #include "PageManager.h"
 #include "Loader.h"
 
+#define TOP_STACK_VPN (USER_BREAK / PAGE_SIZE - 1)
+#define STACK_SIZE 1
+
 StackManager::StackManager(UserProcess *parent) : parent_{parent} {
   debug(STACKMANAGER, "StackManager Constructor start, PID %zu\n", parent_->pid_);
   debug(STACKMANAGER, "StackManager Constructor end\n");
@@ -15,9 +18,12 @@ StackManager::StackManager(UserProcess *parent) : parent_{parent} {
 
 void StackManager::createStack(size_t tid) {
   debug(STACKMANAGER, "creating stack for thread %zu\n", tid);
-  size_t page_for_stack = PageManager::instance()->allocPPN();
-  bool vpn_mapped = parent_->loader_->arch_memory_.mapPage(USER_BREAK / PAGE_SIZE - 1, page_for_stack, 1);
-  assert(vpn_mapped && "Virtual page for stack was already mapped - this should never happen");
+
+  size_t stack_ppn = PageManager::instance()->allocPPN();
+  size_t stack_vpn = TOP_STACK_VPN - tid * STACK_SIZE;
+
+  assert(parent_->loader_->arch_memory_.mapPage(stack_vpn, stack_ppn, 1)
+         && "Virtual page for stack was already mapped - this should never happen");
 }
 
 void StackManager::freeStack(size_t tid) {
