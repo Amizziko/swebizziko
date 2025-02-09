@@ -12,8 +12,19 @@ Please have a look at https://www.iaik.tugraz.at/os
 - hello world
 - process thread separation
 - pids
-
+- tids
+- basic stack (not dynamic)
+- [x] pthread create
+- [x] pthreead exit
+- 
 # TODO
 - [ ] exit synchronization
-- [ ] pthread create
-- [ ] pthreead exit
+- [ ] cancel
+- [ ] suicide
+- [ ] allocNppn
+- [ ] local fd
+- [ ] sleep
+- [ ] pagefaulthandler
+- [ ] pipes??
+- [ ] local thread storage stuff
+- [ ]  
