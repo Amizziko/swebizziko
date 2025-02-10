@@ -7,6 +7,7 @@
 
 #include "Thread.h"
 #include "helpers.h"
+#define PTHREAD_CANCELED ((void*)-1)
 
 class UserProcess;
 
@@ -18,11 +19,20 @@ public:
     ~UserThread();
     void Run() override; // not used
     void kill() override;
+    bool schedulable() override;
+    bool asnychCancelRequested();
+    bool deffCancelRequested();
+    void tryCancel() override;
+
     UserProcess *parent_;
 
 
     //resources
     bool final = false; //make atomic if appropriate todo
+    ustl::atomic<bool> cancel_requested_ = false;
+    ustl::atomic<bool> cancel_enabled_ = true;
+    ustl::atomic<bool> cancel_asynch_ = true;
+    ustl::atomic<bool> force_cancel_requested_ = false;
 
     //locks
 

@@ -99,5 +99,6 @@ const size_t PTHREAD_CREATE             = Ansi_Yellow | OUTPUT_ENABLED;
 const size_t PTHREAD_EXIT             = Ansi_Yellow | OUTPUT_ENABLED;
 const size_t PTHREAD_JOIN             = Ansi_Yellow | OUTPUT_ENABLED;
 const size_t PTHREAD_CANCEL             = Ansi_Yellow | OUTPUT_ENABLED;
+const size_t SUICIDE             = Ansi_Red | OUTPUT_ENABLED;
 
 const size_t MEOW             = Ansi_Yellow | OUTPUT_ENABLED;

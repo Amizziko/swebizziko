@@ -77,7 +77,8 @@ class Thread
      * Tells the scheduler if this thread is ready for scheduling
      * @return true if ready for scheduling
      */
-    bool schedulable();
+    virtual bool schedulable();
+    virtual void tryCancel(){}
   
   
     uint32 kernel_stack_[2048];

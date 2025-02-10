@@ -8,6 +8,7 @@
 #include "ArchThreads.h"
 #include "PageManager.h"
 #include "Loader.h"
+#include "Syscall.h"
 
 void UserThread::Run() {
   debug(USERTHREAD, "Run: Fail-safe kernel panic - you probably have forgotten to set switch_to_userspace_ = 1\n");
@@ -77,4 +78,28 @@ UserThread::~UserThread() {
   if (final)
     delete parent_;
   debug(USERTHREAD, "thread destructor complete!\n");
+}
+
+bool UserThread::schedulable() {
+  if (asnychCancelRequested() && switch_to_userspace_){
+    kernel_registers_->rip = (uint64)(&Syscall::suicideThread);
+    switch_to_userspace_ = 0;
+  }
+
+  return Thread::schedulable();
+}
+
+bool UserThread::asnychCancelRequested() {
+  return force_cancel_requested_ || (cancel_requested_ && cancel_enabled_ && cancel_asynch_);
+}
+
+bool UserThread::deffCancelRequested() {
+  return force_cancel_requested_ || (cancel_requested_ && cancel_enabled_);
+}
+
+void UserThread::tryCancel() {
+  if (deffCancelRequested()) {
+    debug(SUICIDE, "deferred cancel received, exiting thread %zu ...\n", getTID());
+    Syscall::exitThread((size_t) PTHREAD_CANCELED);
+  }
 }
