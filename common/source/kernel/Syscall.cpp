@@ -60,6 +60,9 @@ Syscall::syscallException(size_t syscall_number, size_t arg1, size_t arg2, size_
     case sc_pthread_exit:
       exitThread(arg1);
       break;
+    case sc_pthread_cancel:
+      return_value = cancelThread(arg1);
+      break;
     default:
       return_value = -1;
       kprintf("Syscall::syscallException: Unimplemented Syscall Number %zd\n", syscall_number);
@@ -201,4 +204,16 @@ void Syscall::exitThread(size_t retval) {
 
   debug(PTHREAD_EXIT, "called on thread %zu with retval %zu\n", currentThread->getTID(), retval);
   currentThread->kill();
+}
+
+size_t Syscall::cancelThread(size_t tid) {
+  currentUserProcess->threads_lock_.acquire();
+  if(!currentUserProcess->threads_.count(tid)){
+    currentUserProcess->threads_lock_.release();
+    return -1;
+  }
+  auto thread =  currentUserProcess->threads_.find(tid)->second;
+  thread->cancel_requested_ = true;
+  currentUserProcess->threads_lock_.release();
+  return 0;
 }

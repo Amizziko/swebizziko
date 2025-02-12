@@ -23,5 +23,7 @@ class Syscall
 
     static void exitThread(size_t retval);
     static void suicideThread();
+
+    static size_t cancelThread(size_t tid);
 };
 
