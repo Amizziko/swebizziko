@@ -3,6 +3,7 @@
 #include "UserThread.h"
 #include "umap.h"
 #include "Mutex.h"
+#include "Condition.h"
 #include "helpers.h"
 #include "MemoryManager.h"
 
@@ -37,6 +38,7 @@ public:
 
 //locks
     Mutex threads_lock_;
+    Condition threads_condition_;
     Mutex loader_lock_;
 
 
@@ -44,5 +46,7 @@ public:
     size_t getNewTID();
     void addThread(UserThread *t);
     UserThread *createThread(thread_create::data &data);
+
+    void killAllThreads();
 };
 

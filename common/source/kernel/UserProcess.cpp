@@ -19,6 +19,7 @@ UserProcess::UserProcess(ustl::string filename, FileSystemInfo *fs_info, uint32 
 
 //locks
         threads_lock_("UserProcess::threads_lock_"),
+        threads_condition_(&threads_lock_, "UserProcess::threads_condition_"),
         loader_lock_("UserProcess::loader_lock_") {
   ProcessRegistry::instance()->processStart(); //should also be called if you fork a process
   debug(USERPROCESS, "UserProcess constructor start for PID %zu, path %s\n", pid_, filename.c_str());
@@ -112,4 +113,17 @@ UserThread *UserProcess::createThread(thread_create::data &data) {
   thread->epilogue();
 
   return thread;
+}
+
+void UserProcess::killAllThreads() {
+  threads_lock_.acquire();
+  for (const auto& thread: threads_) {
+    thread.second->force_cancel_requested_ = true;
+  }
+
+  debug(SUICIDE, "suicide requested for all threads of process %zu\n", pid_);
+  while (threads_.size() > 1)
+    threads_condition_.wait();
+
+  threads_lock_.release();
 }

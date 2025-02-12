@@ -59,6 +59,8 @@ void UserThread::kill() {
     debug(USERTHREAD, "kill called on final thread\n");
     final = true;
   }
+
+  parent_->threads_condition_.broadcast();
   parent_->threads_lock_.release();
 
   if (final)

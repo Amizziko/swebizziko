@@ -80,6 +80,9 @@ void Syscall::pseudols(const char *pathname, char *buffer, size_t size) {
 
 void Syscall::exit(size_t exit_code) {
   debug(SYSCALL, "Syscall::EXIT: called, exit_code: %zd\n", exit_code);
+
+  currentUserProcess->killAllThreads();
+
   currentThread->kill();
   assert(false && "This should never happen");
 }
