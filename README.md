@@ -27,11 +27,11 @@ Please have a look at https://www.iaik.tugraz.at/os
 - [ ] ML COW
 - [ ] fork
 - [ ] exec
-- [ ] local fd
 - [ ] sleep
 - [ ] pagefaulthandler
-- [ ] pipes??
 - [ ] local thread storage stuff
-- [ ] aslr
 - [ ] mapping based stack and heap -> dynamic mapping system
-- [ ]  
+- [ ] aslr
+- [ ] local fd
+- [ ] pipes??
+- [ ] 
